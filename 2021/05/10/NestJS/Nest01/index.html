@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Soyeong Choi">
+
+
+    <meta name="subtitle" content="기록용 블로그">
+
+
+    <meta name="description" content="Personal IT Diary">
+
+
+    <meta name="keywords" content="Node.js, html, React, Docker">
+
+
+<title>NestJS Graphql 연동 | StudyYeong</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Study Yeong</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Study Yeong</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">NestJS Graphql 연동</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Soyeong Choi</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">5월 10, 2021&nbsp;&nbsp;0:57:43</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="NestJS-Graphql-함께-사용해보기"><a href="#NestJS-Graphql-함께-사용해보기" class="headerlink" title="NestJS + Graphql 함께 사용해보기"></a>NestJS + Graphql 함께 사용해보기</h1><h2 id="Mutations"><a href="#Mutations" class="headerlink" title="Mutations"></a>Mutations</h2><p><img src="https://docs.nestjs.com/graphql/mutations" alt="공식 도큐먼드 링크"></p>
+<p>Mutation은 GraphQL에서 서버 사이드 데이터를 modify 하는 방식이다. REST에서 GET 메서드의 요청은 데이터 수정을 하지 못하도록 하는게 원칙인 것 처럼 Query로 들어온 요청은 데이터를 수정하지 못한다. Nest에서는 <code>@Mutation()</code> 데코레이터를 사용해서 구현할 수 있다. 구현하는데에 다양한 방식이 있지만 <code>Code first</code>를 사용했다.</p>
+<h3 id="Code-first"><a href="#Code-first" class="headerlink" title="Code first"></a>Code first</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Mutation(<span class="function"><span class="params">returns</span> =&gt;</span> Post)</span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="title">upvotePost</span>(<span class="params">@Args(&#123; name: <span class="string">&#x27;postId&#x27;</span>, type: () =&gt; Int &#125;) postId: number</span>)</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">this</span>.postsService.upvoteById(&#123; <span class="attr">id</span>: postId &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>위의 코드는 아래와 같은 graphql 코드를 생성해낸다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">type Mutation &#123;</span><br><span class="line">  upvotePost(postId: Int!): Post</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>upvotePost</code> 메서드는 <code>postId</code>라는 파라미터를 인자로 받고 이를 전달해 서비스에 작성한 로직을 실행시킨다.<br>만약 mutation이 <strong>object</strong>를 인자로 받아야 한다면, <strong>input type</strong>을 이용해야 한다.</p>
+<p>Inputtype은 특별한 성격의 object type을 의미하는데 <strong>input type만이 인자로써 전달될 수 있다.</strong> (이걸 몰라서 한참이나 헤맷다😢) 다른 기능들과 마찬가지로 <code>@InputType()</code> 데코레이터로 생성할 수 있다.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; InputType, Field &#125; <span class="keyword">from</span> <span class="string">&quot;@nestjs/graphql&quot;</span>;</span><br><span class="line"></span><br><span class="line">@InputType()</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">UpvotePostInput</span> </span>&#123;</span><br><span class="line">  @Field()</span><br><span class="line">  <span class="attr">postId</span>: number;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@InputType()</code> 은 option object를 인자로 받는다. 예를 들면 type의 설명을 전달 할 수 있다. TypeScript의 <strong>metadata reflection system</strong>(뭔지 모르겠다) 때문에 사용자는 <code>@Field()</code> 데코레이터를 꼭 써줘야 한다.<br>이제 @InputType을 작성했기 때문에 아래와 같이 작성이 가능하다.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@Mutation(<span class="function"><span class="params">returns</span> =&gt;</span> Post)</span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="title">upvotePost</span>(<span class="params"></span></span></span><br><span class="line"><span class="params"><span class="function">  @Args(<span class="string">&#x27;upvotePostData&#x27;</span>) upvotePostData: UpvotePostInput,</span></span></span><br><span class="line"><span class="params"><span class="function"></span>)</span> &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Nestjs/"># Nestjs</a>
+                    
+                        <a href="/tags/graphQL/"># graphQL</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/13/NestJS/Nest02/">Nest 02</a>
+            
+            
+            <a class="next" rel="next" href="/2021/03/27/Else/error01/">Heroku deploy error - devDependency module 설치 이상</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Soyeong Choi | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

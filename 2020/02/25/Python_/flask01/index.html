@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Soyeong Choi">
+
+
+    <meta name="subtitle" content="기록용 블로그">
+
+
+    <meta name="description" content="Personal IT Diary">
+
+
+    <meta name="keywords" content="Node.js, html, React, Docker">
+
+
+<title>Flask와 NGINX | StudyYeong</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Study Yeong</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Study Yeong</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Flask와 NGINX</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Soyeong Choi</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">2월 25, 2020&nbsp;&nbsp;22:37:14</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Python/">Python</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="Flask와-Nginx로-클라우드-서비스-배포하기"><a href="#Flask와-Nginx로-클라우드-서비스-배포하기" class="headerlink" title="Flask와 Nginx로 클라우드 서비스 배포하기"></a>Flask와 Nginx로 클라우드 서비스 배포하기</h1><h2 id="ubuntu-18-04-환경에서-Flask앱-Nginx로-서비스하기"><a href="#ubuntu-18-04-환경에서-Flask앱-Nginx로-서비스하기" class="headerlink" title="ubuntu 18.04 환경에서 Flask앱 Nginx로 서비스하기"></a>ubuntu 18.04 환경에서 Flask앱 Nginx로 서비스하기</h2><p>먼저 NHN TOAST 서버에서 인스턴스를 생성하고 플로팅 아이피를 설정해놓은 상태에서 진행하였다. 수많은 구글링을 해봤지만 버전에따라 명령어나 패키지 이름이 달라지는 경우가 있어 설정이 쉽지 않았다. 드디어 설정을 완료하여 글을 쓴다.<br>프로젝트 개발시 작성했던 글이기 때문에 진행 흐름에 따라 오류는 모두 기록해뒀다.</p>
+<p>(2020년 2월 26일 기준)</p>
+<h3 id="설치-환경"><a href="#설치-환경" class="headerlink" title="설치 환경"></a>설치 환경</h3><ul>
+<li>NHN Toast Instance</li>
+<li>ubuntu 18.04</li>
+<li>nginx 1.14.0</li>
+<li>python 3.6.9(OpenCV)</li>
+</ul>
+<p>모든 작업은 작업을 위해 임시로 만든 폴더 <code>/home/ubuntu/myproject</code> 에서 진행한다.<br>연결을 위해 임시로 <code>test.py</code>파일을 생성했다.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line">application = Flask(__name__)</span><br><span class="line"><span class="meta">@application.route(<span class="params"><span class="string">&quot;/&quot;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;&lt;h1&gt;hello!&lt;/h1&gt;&quot;</span></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    application.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Nginx-설치"><a href="#Nginx-설치" class="headerlink" title="Nginx 설치"></a>Nginx 설치</h2><p>ubuntu 18.04 환경에서 설치는 아래 명령어로 진행한다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get update</span><br><span class="line">$ sudo apt-get upgrade</span><br><span class="line">$ sudo apt-get install nginx</span><br></pre></td></tr></table></figure>
+
+<p>설치 후 인스턴스의 <code>floating ip</code>로 접속하여 ‘Welcome to Nginx’ 라는 Nginx 기본 페이지가 보인다면 설치가 잘 된 것이다.</p>
+<h2 id="서버-설정"><a href="#서버-설정" class="headerlink" title="서버 설정"></a>서버 설정</h2><p>그 다음 본격적으로 환경설정을 시작해보자.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ cd /etc/nginx/sites-available</span><br><span class="line">$ sudo touch myproject</span><br><span class="line">$ vi myproject</span><br></pre></td></tr></table></figure>
+
+<p>생성된 <code>myproject</code> 파일에 아래와 같이 입력한다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name localhost; #instance에 등록해놓은 도메인 입력도 가능</span><br><span class="line">    location / &#123;</span><br><span class="line">        include uwsgi_params;</span><br><span class="line">        uwsgi_pass unix:/home/ubuntu/myproject/myproject.sock</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>여기서 <code>uwsgi_pass</code> 의 의미는 뒤에 지정해준 경로의 소켓에 포워딩해준다는 의미로 이해하자. 다음으로 <code>sympoblic link</code>를 설정하여 사이트를 활성화 하고 기본 구성인 <code>default</code>파일은 삭제한 후 nginx를 restart해준다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo ln -s /etc/nginx/sites-available/myproject /etc/nginx/sites-enabled</span><br><span class="line">$ sudo rm /etc/nginx/sites-enabled/default</span><br><span class="line">$ sudo service nginx restart</span><br></pre></td></tr></table></figure>
+
+<p>파일에 오타가 있을지도 모르니 꼭 nginx가 정상 구동되는지 중간중간 확인해준다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo nginx -t</span><br></pre></td></tr></table></figure>
+
+<h2 id="가상-환경-Virtualenv-설치"><a href="#가상-환경-Virtualenv-설치" class="headerlink" title="가상 환경 Virtualenv 설치"></a>가상 환경 Virtualenv 설치</h2><p>이제 패키지의 충돌을 방지하기 위해 가상환경을 만들어서 관리하도록하자. 마찬가지로 모든 작업은 <code>myproject</code> 디렉토리 내에서 진행했다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ apt install virtualenv</span><br><span class="line">$ virtualenv -p python3 myenv</span><br><span class="line">$ source myenv/bin/activate</span><br></pre></td></tr></table></figure>
+
+<p>서비스 할 flask 앱에 <code>requirements.txt</code>에 명시된 추가로 설치해야하는 패키지가 존재한다면, 당연하지만 가상환경이 활성화된 상태에서 진행해야 한다.</p>
+<p>위 코드의 두번째 줄은 python3을 사용하는 가상환경 <code>myenv</code> 를 만드는 코드이고,<br>세번째 줄은 생성된 <code>myenv</code>가상환경으로 진입하는 것이다. 정상적으로 실행됐다면 커맨드의 맨 앞에 (myenv)가 추가되어야 한다.</p>
+<h3 id="OpenCV-설치-오류"><a href="#OpenCV-설치-오류" class="headerlink" title="OpenCV 설치 오류"></a>OpenCV 설치 오류</h3><p>프로젝트 개발시 사용했던 OpenCV 패키지를 설치하려는데 오류가 발생했다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python -m pip install opencv-python</span><br></pre></td></tr></table></figure>
+
+<p>정상적으로 설치가 완료되었다고 알림이 뜨는데도 불구하고 python을 실행시켜 import 하려고 하면 오류가 발생했다.<br><code>(&#39;ImportError: libSM.so.6: cannot open shared object file&#39;)</code> 이 오류는 아래의 코드를 실행하면 해결 할 수 있다. 구글링에서 다른 해결법도 있었지만 나에게는 먹히지 않았고 더 찾아보다 아래 코드를 발견했다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ apt update &amp;&amp; apt install -y libsm6 libxext6 libxrender-dev</span><br></pre></td></tr></table></figure>
+
+<p>다행히 오류를 해결했다.</p>
+<h2 id="uwsgi-설치"><a href="#uwsgi-설치" class="headerlink" title="uwsgi 설치"></a>uwsgi 설치</h2><p>만약 현재 환경에 <code>anaconda3</code>가 설치되어있다면 pip의 충돌로 인해 <code>uwsgi</code> 설치에 어려움을 겪을 수도 있다.<br><em>나도 여러번의 시도 중에 anaconda를 이용하는 방법도 시도해보았지만 uwsgi 설치에서 번번이 애를 먹었다. 그래서 결국 anaconda를 사용하지 않기로 결정했다.</em> 😂</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pip isntall uwsgi</span><br></pre></td></tr></table></figure>
+
+<p>설치가 완료되면 flask 앱을 5000번 포트로 띄워 정상 작동하는지 확인해보자</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ uwsgi --socket 0.0.0.0:5000 --protocol=http -w test:application</span><br></pre></td></tr></table></figure>
+
+<p>위 코드는 <code>test.py</code> 파일안에 있는 <code>application</code> 을 구동하겠다는 의미이다.<br>따라서 만약 구동하는 파일이 <code>run.py</code> 안의 <code>APP</code> 앱 이라면 <code>run:APP</code>으로 작성 해야한다.<br>floating ip의 5000번 포트로 접속시 정상작동 하는 것을 확인 할 수 있다.<br>위 작업을 좀 더 쉽게 하기 위해서 <code>.ini</code> 설정 파일을 만들어서 쉽게 구동할 수 있도록 하자.<br><code>myproject.ini</code>파일을 생성한다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[uwsgi]</span><br><span class="line">module = test:application</span><br><span class="line">master = true</span><br><span class="line">processes = 5</span><br><span class="line">virtualenv = /home/ubuntu/myproject/myenv</span><br><span class="line">chdir = /home/ubuntu/myproject</span><br><span class="line">socket = /home/ubuntu/myproject/myproject.sock</span><br><span class="line">chmod-socket = 666</span><br><span class="line">vacuum = true</span><br><span class="line">daemonize = /home/ubuntu/myproject/uwsgi.log</span><br><span class="line">die-on-term = true</span><br></pre></td></tr></table></figure>
+
+<p>설정파일을 작성 한 후 <code>myproject</code> 앱의 경로에서 아래의 명령어를 입력해주면 설정이 완료된다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ uwsgi --ini myproject.ini</span><br></pre></td></tr></table></figure>
+
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a target="_blank" rel="noopener" href="https://teddylee777.github.io/aws/flask-aws-nginx-%EC%84%A4%EC%A0%95%EB%B0%A9%EB%B2%95">Flak-aws-nginx</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Python/"># Python</a>
+                    
+                        <a href="/tags/Flask/"># Flask</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/07/28/Algorithm/BOJ-7569/">BOJ - 7569. 토마토</a>
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Soyeong Choi | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
