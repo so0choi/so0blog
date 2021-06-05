@@ -192,13 +192,20 @@
                         </span>
                     
                     
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/AWS/">AWS</a>
+                            
+                        </span>
+                    
                 </div>
             
         </header>
 
         <div class="post-content">
             <h1 id="Github-page-AWS-Route53-custom-domain으로-서비스하기"><a href="#Github-page-AWS-Route53-custom-domain으로-서비스하기" class="headerlink" title="Github page AWS Route53 custom domain으로 서비스하기"></a>Github page AWS Route53 custom domain으로 서비스하기</h1><p>Route53은 AWS의 클라우드 <strong>DNS 웹 서비스</strong>이다. DNS 서비스를 제공하는 다른 서비스들도 많지만 Route53을 사용할 경우 EC2 또는 CloudFront 등 AWS에서 실행되는 인프라에 효과적으로 연결된다.</p>
-<p>이번에는 Route53에서 도메인을 사서 github page로 연결시켜보았다. 다른 더 저렴한 <code>namecheap</code> 같은 사이트에서 구매해도 되지만 Route53으로 서비스할 것이기 때문에 Route53에서 도메인을 구입하는 것이 절차를 조금 간단하게 할 수 있는 방법이다. </p>
+<p>이번에는 Route53에서 도메인을 사서 github page로 연결시켜보았다. 다른 더 저렴한 <code>namecheap</code> 같은 사이트에서 구매해도 되지만 Route53으로 서비스할 것이기 때문에 Route53에서 도메인을 구입하는 것이 절차를 조금 간단하게 할 수 있는 방법이다.</p>
 <h3 id="도메인-구입"><a href="#도메인-구입" class="headerlink" title="도메인 구입"></a>도메인 구입</h3><p><img src="/images/2020-10-19-10-56-54.png"></p>
 <p>구입을 눌러서 마음에 드는 도메인을 살 수 있다. 나는 가장 저렴한 8$의 <code>.be</code> 도메인을 구입했다.</p>
 <p>구입시에 모든 등록 정보는 영어로 입력해야 한다.</p>
@@ -212,10 +219,12 @@
 <p><img src="/images/2020-10-19-11-42-49.png"></p>
 <ul>
 <li>레코드 이름 : (비워두기)</li>
-<li>레코드 유형 : A </li>
-<li>값 : Github 서버 ip 주소 </li>
-<li><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">185.199.108.153</span><br><span class="line">185.199.109.153</span><br><span class="line">185.199.110.153</span><br><span class="line">185.199.111.153</span><br></pre></td></tr></table></figure></li>
+<li>레코드 유형 : A</li>
+<li>값 : Github 서버 ip 주소</li>
 </ul>
+<p>-</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">185.199.108.153</span><br><span class="line">185.199.109.153</span><br><span class="line">185.199.110.153</span><br><span class="line">185.199.111.153</span><br></pre></td></tr></table></figure>
+
 <p>이렇게 입력하고 레코드를 생성한다. (저 4가지 중 하나만 입력해도 동작한다고 한다)</p>
 <p>레코드를 한가지 더 생성해야 한다. 또다시 레코드 생성을 클릭한다.</p>
 <ul>
