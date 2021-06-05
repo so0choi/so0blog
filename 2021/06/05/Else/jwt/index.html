@@ -18,7 +18,7 @@
     <meta name="keywords" content="Node.js, html, React, Docker">
 
 
-<title>Nest04 - ConfigService로 환경변수 사용하기 | StudyYeong</title>
+<title>JWT - Json Web Token | StudyYeong</title>
 
 
 
@@ -179,7 +179,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Nest04 - ConfigService로 환경변수 사용하기</h1>
+            <h1 class="post-title">JWT - Json Web Token</h1>
             
                 <div class="post-meta">
                     
@@ -188,7 +188,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">5월 23, 2021&nbsp;&nbsp;23:01:48</a>
+                        Date: <a href="#">6월 5, 2021&nbsp;&nbsp;16:44:59</a>
                         </span>
                     
                     
@@ -197,24 +197,34 @@
         </header>
 
         <div class="post-content">
-            <h1 id="ConfigService-사용하기"><a href="#ConfigService-사용하기" class="headerlink" title="ConfigService 사용하기"></a>ConfigService 사용하기</h1><p>프로젝트 환경에 관련된 변수들이 있다. 예를들면 DB에 관한 정보라던가 AWS 접근 정보라던가. 이런 정보들을 .env에서 관리하도록 프로젝트를 구성했다면 <code>process.env.</code>으로 변수에 접근할 수 있다. 하지만 이렇게 하는 것은 NestJS에서 선호하는 방식은 아니다. NestJS에서는 <code>ConfigService</code>을 사용하기를 권장한다.</p>
-<p><a target="_blank" rel="noopener" href="https://docs.nestjs.com/techniques/configuration#using-the-configservice">공식 문서 - Usig the ConfigService</a></p>
-<p>문서에 따르면 ConfigModule을 import해서 쓰면 된다고 한다. 하지만 다른 setting이 있는 경우 <strong>global module</strong>로 설정해서 사용할 수도 있다. 그럼 ConfigModule을 또다시 import 할 필요 없다!</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ConfigModule.forRoot(&#123;</span><br><span class="line">  <span class="attr">isGlobal</span>: <span class="literal">true</span>,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+            <h1 id="JWT"><a href="#JWT" class="headerlink" title="JWT"></a>JWT</h1><p>토큰 기반 인증방식이다. 제공되는 API를 유지보수 하던 중 jwt를 처음 봤다. 유저와의 인증 작업을 수행하는 어플리케이션은 직접 전체를 만들어본 적이 없기 때문이다. 너무나 흔하게 사용되는 기술이니만큼 잘 알아둬야겠다는 생각이들어 정리한다.</p>
+<h2 id="Stateless-서버"><a href="#Stateless-서버" class="headerlink" title="Stateless 서버"></a>Stateless 서버</h2><ul>
+<li>Stateful 서버 : 클라이언트 상태 정보를 계속해서 유지하고 이를 이용해 서비스를 제공</li>
+<li>Stateless 서버 : 클라이언트 상태 정보를 유지하지 않고 요청만을 통해서 작업을 처리</li>
+</ul>
+<p>Stateless 서버의 경우 확장성이 높다. 대표적인 예로 <strong>OAuth</strong>가 있다. 소셜 계정을 이용해 다른 웹서비스 로그인이 가능한 기술이다. 상태를 저장하지 않기 때문에 어떤 요청이 들어와도 처리할 수 있다. 또한 모바일 어플리케이션을 개발한다면 토큰 기반 인증이 가장 이상적이다.</p>
+<h2 id="세션"><a href="#세션" class="headerlink" title="세션"></a>세션</h2><p>토큰을 사용하기 이전의 인증방식은 서버에서 유저의 정보, 즉 세션을 기억하고 이를 사용해 동작했다. 아직도 이런 방식으로 돌아가는 웹사이트가 많지만 결코 좋은 방식이라고 할 수 없다. 동시 로그인 중인 사용자의 수가 급격히 증가하는 경우 이를 저장하는 서버의 램에 과부하가 올 수 있고 이를 피하기 위해 데이터베이스에 저장하는 경우도 성능에 좋지 않다.</p>
+<h2 id="토큰-기반-인증"><a href="#토큰-기반-인증" class="headerlink" title="토큰 기반 인증"></a>토큰 기반 인증</h2><p>토큰 기반 인증은 stateless 연결 방식이다. 과정을 간략하게 정리하면 아래와 같다.</p>
+<ol>
+<li>유저가 아이디와 비밀번호로 로그인</li>
+<li>서버는 계정 정보를 검증 후 정확하다면 signed 토큰을 발급</li>
+<li>클라이언트는 전달받은 토큰을 저장해두고 요청시 해당 토큰을 함께 전송</li>
+<li>그 이후부터 서버는 토큰을 검증하며 요청에 응답</li>
+</ol>
+<p>사용자는 http 헤더에 토큰을 포함해 전달할 수 있다.</p>
+<h2 id="JWT란"><a href="#JWT란" class="headerlink" title="JWT란?"></a>JWT란?</h2><p>JSON Web Token의 줄입말이다. 두 party 사이에서 보안이 보장된 json 정보 전달을 가능하게 해주는 웹 표준(RFC 7519)이다.디지털 서명이 되어있기 때문에 신뢰성이 있고 확인이 가능한 구현체이다.</p>
+<p><a target="_blank" rel="noopener" href="https://www.npmjs.com/package/jsonwebtoken">jsonwebtoken</a>이라는 모듈로 npm에도 올라와있다. 주 다운로드 수가 5백만이 넘어갈 정도로 보편적인 기술이다.</p>
+<h2 id="jsonwebtoken-사용법"><a href="#jsonwebtoken-사용법" class="headerlink" title="jsonwebtoken 사용법"></a>jsonwebtoken 사용법</h2><p><strong>jwt.sign(payload, secretOrPrivateKey, [options, callback])</strong></p>
+<p><code>payload</code>는 string 이어야 한다. string이 아니라면 자체적으로 <code>JSON.stringify()</code>가 적용된다.<br><code>secretOrPrivateKey</code>는 암호화 알고리즘에 사용될 키를 말한다.<br>다양한 옵션을 줄 수 있는데 예시로 아래 두 가지가 있다.</p>
+<ul>
+<li>algorithm(default: HS256)</li>
+<li>expiresIn</li>
+</ul>
+<h3 id="기본-사용-예"><a href="#기본-사용-예" class="headerlink" title="기본 사용 예"></a>기본 사용 예</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> jwt = <span class="built_in">require</span>(<span class="string">&quot;jsonwebtoken&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> token = jwt.sign(&#123; <span class="attr">foo</span>: <span class="string">&quot;bar&quot;</span> &#125;, <span class="string">&quot;shhhhh&quot;</span>);</span><br></pre></td></tr></table></figure>
 
-<p>나 또한 <code>app.module.ts</code>에서 ConfigModule에 <code>joi</code> 사용을 세팅했기 떄문에 <code>isGlobal : true</code>로 설정해 사용했다.</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ConfigModule.forRoot(&#123;</span><br><span class="line">      <span class="attr">isGlobal</span>: <span class="literal">true</span>,</span><br><span class="line">      <span class="attr">envFilePath</span>: process.env.NODE_ENV === <span class="string">&#x27;dev&#x27;</span> ? <span class="string">&#x27;.env.dev&#x27;</span> : <span class="string">&#x27;.env.test&#x27;</span>,</span><br><span class="line">      <span class="attr">ignoreEnvFile</span>: process.env.NODE_ENV === <span class="string">&#x27;prod&#x27;</span>,</span><br><span class="line">      <span class="attr">validationSchema</span>: Joi.object(&#123;</span><br><span class="line">        <span class="attr">NODE_ENV</span>: Joi.string().valid(<span class="string">&#x27;dev&#x27;</span>, <span class="string">&#x27;prod&#x27;</span>).required(),</span><br><span class="line">        <span class="attr">DB_HOST</span>: Joi.string().required(),</span><br><span class="line">        ...</span><br><span class="line">      &#125;),</span><br><span class="line">    &#125;),</span><br></pre></td></tr></table></figure>
-
-<p>그리고 feature module에서는 ConfigService를 import한다.</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; ConfigService &#125; <span class="keyword">from</span> <span class="string">&#x27;@nestjs/config&#x27;</span>;</span><br><span class="line"></span><br><span class="line">@Module(&#123;</span><br><span class="line">  <span class="attr">imports</span>: [ConfigService],</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<p>feature의 service 모듈에서는 이제 이 ConfigService 모듈로 환경변수에 접근이 가능하다.</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; ConfigService &#125; <span class="keyword">from</span> <span class="string">&#x27;@nestjs/config&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">UsersService</span> </span>&#123;</span><br><span class="line">    <span class="title">constructor</span>(<span class="params"></span></span><br><span class="line"><span class="params">        private readonly config: ConfigService,</span></span><br><span class="line"><span class="params">    </span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>get()</code>을 사용해 접근한다.</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">this</span>.config.get(<span class="string">&quot;SECRET_KEY&quot;</span>));</span><br></pre></td></tr></table></figure>
-
-<h2 id="forRoot"><a href="#forRoot" class="headerlink" title="forRoot()"></a><code>forRoot()</code></h2><p>위의 ConfigModule을 global로 설정할 때 **forRoot()**를 사용했다. forRoot()는 module을 설정할 때 사용한다. return type을 보면 Dynamic Module을 반환하고있다. 동적인 모듈은 결과적으로는 모두 정적 모듈이 된다. Nest에서 모듈 파일들은 forRoot()를 통해 동적으로 세팅이 가능하고 최종적으로는 정적인 모듈이 되어 반환된다.</p>
+<h2 id="참고"><a href="#참고" class="headerlink" title="참고"></a>참고</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://velopert.com/2350"></a></li>
+</ul>
 
         </div>
 
@@ -229,7 +239,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="https://so0choi.github.io/2021/05/23/NestJS/Nest04/">https://so0choi.github.io/2021/05/23/NestJS/Nest04/</a></span>
+                        <span><a href="https://so0choi.github.io/2021/06/05/Else/jwt/">https://so0choi.github.io/2021/06/05/Else/jwt/</a></span>
                     </p>
                 
                 
@@ -253,7 +263,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/NestJS/"># NestJS</a>
+                        <a href="/tags/jwt/"># jwt</a>
                     
                         
                 </span>
@@ -266,10 +276,10 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2021/06/05/Else/jwt/">JWT - Json Web Token</a>
+                <a class="prev" rel="prev" href="/2021/06/06/NestJS/Nest05/">Nest05 - Middleware</a>
             
             
-            <a class="next" rel="next" href="/2021/05/16/NestJS/Nest03/">InputType vs ArgsType</a>
+            <a class="next" rel="next" href="/2021/05/23/NestJS/Nest04/">Nest04 - ConfigService로 환경변수 사용하기</a>
             
         </section>
 
